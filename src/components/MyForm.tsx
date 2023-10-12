@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useEffect } from "react";
+import Input from "./Input";
 
 const schema = Yup.object().shape({
     name: Yup.string().required('Nome é obrigatório').min(7, 'Nome deve ter no mínimo 7 caracteres'),
@@ -11,12 +11,13 @@ const schema = Yup.object().shape({
 
 type FormType = {
     name: string;
+    lastName?: string;
     email: string;
     password: string;
 };
 
 const simulateRequest = async () => {
-    const myPromise = new Promise((resolve, rejection) => {
+    const myPromise = new Promise((resolve) => {
         setTimeout(() => {
             resolve('Hello');
         },2000);
@@ -38,8 +39,6 @@ function MyForm() {
 
     const { errors, isSubmitting } = formState;
 
-    console.log('errors ', errors)
-
     const handleSubmitData = async (data: any) => {
         console.log(data);
         await simulateRequest();
@@ -58,6 +57,15 @@ function MyForm() {
                     autoFocus 
                 />
                 {errors.name && <p style={{color: 'red'}}>{errors.name.message}</p>}
+            </div>
+            <div className="mb-3">
+                <label className="form-label" htmlFor="lastName">Sobrenome</label>
+                <Input 
+                    {...register('lastName')}
+                    className="form-control border-success"
+                    id="lastName"
+                    name="lastName"
+                />
             </div>
             <div className="mb-3">
                 <label htmlFor="email" className="form-label">E-mail</label>
