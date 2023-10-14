@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Input from "./Input";
@@ -14,6 +14,9 @@ type FormType = {
     lastName?: string;
     email: string;
     password: string;
+    phoneNumbers?: {
+        number: string;
+    }[];
 };
 
 const simulateRequest = async () => {
@@ -27,7 +30,7 @@ const simulateRequest = async () => {
 }
 
 function MyForm() {
-    const { register, handleSubmit, formState, reset } = useForm<FormType>({
+    const { register, handleSubmit, formState, reset, control } = useForm<FormType>({
         mode: 'all',
         resolver: yupResolver(schema),
         /*defaultValues:{
@@ -38,6 +41,11 @@ function MyForm() {
     });
 
     const { errors, isSubmitting } = formState;
+
+    const { append, remove, fields } = useFieldArray({
+        name: 'phoneNumbers',
+        control,
+    });
 
     const handleSubmitData = async (data: any) => {
         console.log(data);
@@ -71,6 +79,27 @@ function MyForm() {
                 <label htmlFor="email" className="form-label">E-mail</label>
                 <input {...register('email')} type="email" className={`form-control ${errors.email ? 'border-danger':'border-success'}`} id="email" />
                 {errors.email && <p style={{color: 'red'}}>{errors.email.message}</p>}
+            </div>
+            <div className="mb-3">
+                <label>List of phone number</label>
+                <div>
+                    {fields.map((field, index) => {
+                        return (<div className="form-control d-flex" key={field.id}>
+                            <input 
+                                type="text" {...register(`phoneNumbers.${index}.number` as const)} 
+                                className="form-control border-success"    
+                            />
+                            {
+                                index >= 0 && (
+                                    <button className="btn btn-danger" onClick={() => remove(index)}>
+                                        Remove
+                                    </button>
+                                )
+                            }
+                        </div>
+                    )})}
+                    <button className="btn btn-secondary" onClick={() => append({number: ""})}>Add Phone Number</button>
+                </div>
             </div>
             <div className="mb-3">
                 <label className="form-label" htmlFor="password">Senha</label>
